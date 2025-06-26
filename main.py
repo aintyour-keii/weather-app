@@ -1,3 +1,5 @@
+# Import requests library
+
 # Create Reference to Weather API (OpenWeatherMap)
 # Create a variable to store Base Url
 

@@ -7,17 +7,29 @@ class WeatherApp:
         self.base_url = "https://api.openweathermap.org/data/2.5/weather"
         self.forecast_url = "https://api.openweathermap.org/data/2.5/forecast"
         
-        self.icon_map = {
-            "01d": "☀️", "01n": "🌙",
-            "02d": "⛅", "02n": "☁️",
-            "03d": "☁️", "03n": "☁️",
-            "04d": " overcast", "04n": " overcast", # Overcast clouds
-            "09d": "🌧️", "09n": "🌧️",
-            "10d": "🌦️", "10n": "🌧️",
-            "11d": "⛈️", "11n": "⛈️",
-            "13d": "🌨️", "13n": "🌨️",
-            "50d": "🌫️", "50n": "🌫️", # Mist/Fog
+        self.filename_map = {
+            "01d": "clear_day.png",
+            "01n": "clear_night.png",
+            "02d": "few_clouds_day.png",
+            "02n": "few_clouds_night.png",
+            "03d": "clouds.png",
+            "03n": "clouds.png",
+            "04d": "overcast.png",
+            "04n": "overcast.png",
+            "09d": "shower_rain.png",
+            "09n": "shower_rain.png",
+            "10d": "rain_day.png",
+            "10n": "rain_night.png",
+            "11d": "thunderstorm.png",
+            "11n": "thunderstorm.png",
+            "13d": "snow.png",
+            "13n": "snow.png",
+            "50d": "mist.png",
+            "50n": "mist.png"
         }
+
+    def get_icon_filename(self, icon_code):
+        return self.filename_map.get(icon_code, "default.png")
         
     def get_weather(self, city):
         params = {
@@ -35,8 +47,8 @@ class WeatherApp:
                 print(f"Error: {current_data.get('message', 'Unknown error occurred.')}")
                 return None
             
-            current_weather_icon_code = current_data["weather"][0]["icon"]
-            current_icon = self.icon_map.get(current_weather_icon_code, "❓")
+            current_icon_code = current_data["weather"][0]["icon"]
+            current_icon_file = self.get_icon_filename(current_icon_code)
 
             weather_data = {
                 'Current': {
@@ -46,7 +58,8 @@ class WeatherApp:
                     "description": current_data["weather"][0]["description"].capitalize(),
                     "humidity": current_data["main"]["humidity"],
                     "wind_speed": current_data["wind"]["speed"],
-                    "icon": current_icon
+                    "icon_code": current_icon_code,
+                    "icon": current_icon_file
                 },
                 'Forecast': {}
             }
@@ -67,15 +80,16 @@ class WeatherApp:
                     continue
 
                 if date_obj.hour == 12 and date_obj.date() not in shown_dates:
-                    day_key = f"day_{len(shown_dates) + 1}"
-                    forecast_weather_icon_code = entry["weather"][0]["icon"]
-                    forecast_icon = self.icon_map.get(forecast_weather_icon_code, "❓")
+                    icon_code = entry["weather"][0]["icon"]
+                    icon_file = self.get_icon_filename(icon_code)
 
+                    day_key = f"day_{len(shown_dates) + 1}"
                     forecast_days[day_key] = {
                         "date": date_obj.strftime("%A, %b %d"),
                         "description": entry["weather"][0]["description"].capitalize(),
                         "temperature": entry["main"]["temp"],
-                        "icon": forecast_icon
+                        "icon_code": icon_code,
+                        "icon": icon_file
                     }
                     shown_dates.add(date_obj.date())
 
@@ -89,7 +103,7 @@ class WeatherApp:
         except Exception as e:
             print("Exception occurred:", e)
             return None
-        
+
     def display_weather(self, weather_data):
         current = weather_data["Current"]
         print("\nCurrent Weather:")

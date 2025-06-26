@@ -87,13 +87,13 @@ class WeatherApp:
         print("\nWeather App")
         print("Enter: 'exit' to exit the app.")
         while True:
-            city = input("\n🌍 Enter a city name: ").strip()
+            city = input("\nEnter a city name: ").strip()
             if city.lower() == "exit":
-                print("👋 Goodbye!")
+                print("Goodbye!")
                 break
 
             if not city:
-                print("⚠️ Please enter a valid city name.")
+                print("Please enter a valid city name.")
                 continue
 
             data = self.get_weather(city)

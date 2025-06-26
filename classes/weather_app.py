@@ -7,6 +7,18 @@ class WeatherApp:
         self.base_url = "https://api.openweathermap.org/data/2.5/weather"
         self.forecast_url = "https://api.openweathermap.org/data/2.5/forecast"
         
+        self.icon_map = {
+            "01d": "☀️", "01n": "🌙",
+            "02d": "⛅", "02n": "☁️",
+            "03d": "☁️", "03n": "☁️",
+            "04d": " overcast", "04n": " overcast", # Overcast clouds
+            "09d": "🌧️", "09n": "🌧️",
+            "10d": "🌦️", "10n": "🌧️",
+            "11d": "⛈️", "11n": "⛈️",
+            "13d": "🌨️", "13n": "🌨️",
+            "50d": "🌫️", "50n": "🌫️", # Mist/Fog
+        }
+        
     def get_weather(self, city):
         params = {
             "q": city,
@@ -22,6 +34,9 @@ class WeatherApp:
             if current_response.status_code != 200:
                 print(f"Error: {current_data.get('message', 'Unknown error occurred.')}")
                 return None
+            
+            current_weather_icon_code = current_data["weather"][0]["icon"]
+            current_icon = self.icon_map.get(current_weather_icon_code, "❓")
 
             weather_data = {
                 'Current': {
@@ -30,7 +45,8 @@ class WeatherApp:
                     "temperature": current_data["main"]["temp"],
                     "description": current_data["weather"][0]["description"].capitalize(),
                     "humidity": current_data["main"]["humidity"],
-                    "wind_speed": current_data["wind"]["speed"]
+                    "wind_speed": current_data["wind"]["speed"],
+                    "icon": current_icon
                 },
                 'Forecast': {}
             }
@@ -52,10 +68,14 @@ class WeatherApp:
 
                 if date_obj.hour == 12 and date_obj.date() not in shown_dates:
                     day_key = f"day_{len(shown_dates) + 1}"
+                    forecast_weather_icon_code = entry["weather"][0]["icon"]
+                    forecast_icon = self.icon_map.get(forecast_weather_icon_code, "❓")
+
                     forecast_days[day_key] = {
                         "date": date_obj.strftime("%A, %b %d"),
                         "description": entry["weather"][0]["description"].capitalize(),
-                        "temperature": entry["main"]["temp"]
+                        "temperature": entry["main"]["temp"],
+                        "icon": forecast_icon
                     }
                     shown_dates.add(date_obj.date())
 

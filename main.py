@@ -1,7 +1,9 @@
 import requests
+from datetime import datetime
 
 API = '6074b2946d25ae8c032028ff26ac67f7'
 BASE_URL = 'https://api.openweathermap.org/data/2.5/weather'
+FORECAST_URL = 'https://api.openweathermap.org/data/2.5/forecast'
 
 def get_weather(city):
     params = {
@@ -19,13 +21,42 @@ def get_weather(city):
             return None
         
         weather_data = {
-            "city": data["name"],
-            "country": data["sys"]["country"],
-            "temperature": data["main"]["temp"],
-            "description": data["weather"][0]["description"].capitalize(),
-            "humidity": data["main"]["humidity"],
-            "wind_speed": data["wind"]["speed"]
+            'Current':{
+                "city": data["name"],
+                "country": data["sys"]["country"],
+                "temperature": data["main"]["temp"],
+                "description": data["weather"][0]["description"].capitalize(),
+                "humidity": data["main"]["humidity"],
+                "wind_speed": data["wind"]["speed"]
+            },
+            
+            'Forecast': {}
         }
+        
+        forecast_response = requests.get(FORECAST_URL, params=params)
+        forecast_data = forecast_response.json()
+
+        shown_dates = set()
+        forecast_days = {}
+
+        for entry in forecast_data["list"]:
+            dt_txt = entry["dt_txt"]
+            date_obj = datetime.strptime(dt_txt, "%Y-%m-%d %H:%M:%S")
+
+            # Pick forecasts around 12:00 PM (or adjust to your preference)
+            if date_obj.hour == 12 and date_obj.date() not in shown_dates:
+                day_key = f"day_{len(shown_dates) + 1}"
+                forecast_days[day_key] = {
+                    "date": date_obj.strftime("%A, %b %d"),
+                    "description": entry["weather"][0]["description"].capitalize(),
+                    "temperature": entry["main"]["temp"]
+                }
+                shown_dates.add(date_obj.date())
+
+                if len(shown_dates) >= 3:
+                    break
+
+        weather_data["Forecast"] = forecast_days
         
         return weather_data
 
@@ -48,15 +79,22 @@ def main():
             print("Enter a valid city name.")
             continue
         
-        weather = get_weather(city)
+        data = get_weather(city)
         
-        if weather:
+        if data:
+            weather = data['Current']
+            forecast = data['Forecast']
+            
             print("\nCurrent Weather:")
             print(f"Location: {weather['city']}, {weather['country']}")
             print(f"Condition: {weather['description']}")
             print(f"Temperature: {weather['temperature']}°C")
             print(f"Humidity: {weather['humidity']}%")
             print(f"Wind Speed: {weather['wind_speed']} m/s")
+            
+            print('\n 3-Day Forecast:')
+            for key, day in forecast.items():
+                print(f"{day['date']}: {day['description']}, {day['temperature']}°C")
             
 if __name__ == "__main__":
     main()

@@ -1,8 +1,8 @@
-from classes.weather_app import WeatherApp
+from classes.weather_gui import WeatherGui
 
 def main():
-    app = WeatherApp()
-    app.run()
+    gui = WeatherGui()
+    gui.run()
     
 if __name__ == "__main__":
     main()

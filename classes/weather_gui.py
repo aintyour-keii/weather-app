@@ -8,23 +8,33 @@ class WeatherGui:
         
         self.root = tk.Tk()
         self.root.title("Weather App")
-        self.root.geometry("500x500")
+        self.root.geometry("420x540")
         self.root.resizable(False, False)
+        self.root.configure(bg="#f0f2f5")
+
+        self.style = ttk.Style()
+        self.style.theme_use("clam")
+        self.style.configure("TLabel", background = "#f0f2f5", font = ("Segoe UI", 11))
+        self.style.configure("TButton", font = ("Segoe UI", 10, "bold"))
+        self.style.configure("TEntry", font = ("Segoe UI", 11))
         
         self.setup_widgets()
         
     def setup_widgets(self):
-        self.city_label = ttk.Label(self.root, text="Enter City: ")
-        self.city_label.pack(pady=10)
+        frame = ttk.Frame(self.root, padding=20)
+        frame.pack(fill=tk.BOTH, expand=True)
         
-        self.city_entry = ttk.Entry(self.root, width=30)
-        self.city_entry.pack()
+        self.city_label = ttk.Label(frame, text="Enter City: ")
+        self.city_label.pack(anchor="w", pady=(0, 4))
+        
+        self.city_entry = ttk.Entry(frame, width=30)
+        self.city_entry.pack(pady=(0, 10))
 
-        self.get_button = ttk.Button(self.root, text="Get Weather", command=self.fetch_weather)
-        self.get_button.pack(pady=10)
+        self.get_button = ttk.Button(frame, text="Get Weather", command=self.fetch_weather)
+        self.get_button.pack(pady=(0, 20))
 
-        self.result_text = tk.Text(self.root, width=40, height=20, state="disabled")
-        self.result_text.pack(pady=10)
+        self.result_text = tk.Text(frame, width=40, height=20, state="disabled", bg="#ddd4cf", font=("Consolas", 10), relief="flat", wrap="word")
+        self.result_text.pack()
         
     def fetch_weather(self):
         city = self.city_entry.get().strip()

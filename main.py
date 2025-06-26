@@ -4,10 +4,14 @@ API = '6074b2946d25ae8c032028ff26ac67f7'
 BASE_URL = 'https://api.openweathermap.org/data/2.5/weather'
 
 def get_weather(city):
-    completed_url = BASE_URL+ f"?{city}&appid={API}&units=metric"
+    params = {
+        "q": city,
+        "appid": API,
+        "units": "metric"
+    }
     
     try:
-        response = requests.get(completed_url)
+        response = requests.get(BASE_URL, params=params)
         data = response.json()
         
         if response.status_code != 200:

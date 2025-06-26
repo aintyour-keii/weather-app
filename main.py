@@ -1,5 +1,5 @@
 import requests
-from datetime import datetime
+from datetime import datetime, date
 
 API = '6074b2946d25ae8c032028ff26ac67f7'
 BASE_URL = 'https://api.openweathermap.org/data/2.5/weather'
@@ -42,6 +42,9 @@ def get_weather(city):
         for entry in forecast_data["list"]:
             dt_txt = entry["dt_txt"]
             date_obj = datetime.strptime(dt_txt, "%Y-%m-%d %H:%M:%S")
+            
+            if date_obj.date() == date.today():
+                continue
 
             # Pick forecasts around 12:00 PM (or adjust to your preference)
             if date_obj.hour == 12 and date_obj.date() not in shown_dates:
@@ -92,7 +95,7 @@ def main():
             print(f"Humidity: {weather['humidity']}%")
             print(f"Wind Speed: {weather['wind_speed']} m/s")
             
-            print('\n 3-Day Forecast:')
+            print('\n3-Day Forecast:')
             for key, day in forecast.items():
                 print(f"{day['date']}: {day['description']}, {day['temperature']}°C")
             

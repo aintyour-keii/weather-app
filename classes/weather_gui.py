@@ -37,6 +37,8 @@ class WeatherGui:
             messagebox.showerror("Error", f"Could not fetch weather for {city}.")
             return
         
+        self.display_weather(data)
+        
     def display_weather(self, data):
         self.result_text.configure(state='normal')
         self.result_text.delete(1.0, tk.END)
